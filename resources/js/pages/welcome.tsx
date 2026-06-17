@@ -1,5 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import React, { useState } from 'react';
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export default function Welcome() {
     const [showLogin, setShowLogin] = useState(false);
@@ -13,8 +15,19 @@ export default function Welcome() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        let toastId: string | number = "";
         post('/login', {
-            onError: () => reset('password'),
+            onStart: () => {
+                toastId = toast.loading("Verifying credentials and logging in...");
+            },
+            onSuccess: () => {
+                toast.dismiss(toastId);
+            },
+            onError: () => {
+                toast.dismiss(toastId);
+                reset('password');
+                toast.error("Authentication failed. Please verify credentials.");
+            },
         });
     };
 
@@ -210,6 +223,7 @@ export default function Welcome() {
                     </div>
                 </div>
             </div>
+            <Toaster />
         </>
     );
 }

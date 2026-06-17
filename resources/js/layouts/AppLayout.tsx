@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from "@/components/ui/sonner"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -79,6 +80,7 @@ export default function AppLayout({ children, breadcrumbs }: AppLayoutProps) {
           </main>
         </SidebarInset>
       </SidebarProvider>
+      <Toaster />
     </TooltipProvider>
   )
 }

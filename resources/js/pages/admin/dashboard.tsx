@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useForm, router, usePage } from "@inertiajs/react"
 import AppLayout from "@/layouts/AppLayout"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -59,7 +60,6 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
-  const [successToast, setSuccessToast] = useState<string | null>(null)
 
   // Form handling for new employee generation
   const createForm = useForm({
@@ -124,11 +124,20 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
   // Handle employee account generation submit
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    let toastId: string | number = ""
     createForm.post("/admin/employees", {
+      onStart: () => {
+        toastId = toast.loading("Generating employee account...")
+      },
       onSuccess: () => {
+        toast.dismiss(toastId)
         setIsCreateOpen(false)
         createForm.reset()
-        showToast("Employee account generated successfully!")
+        toast.success("Employee account generated successfully!")
+      },
+      onError: () => {
+        toast.dismiss(toastId)
+        toast.error("Failed to generate employee account.")
       },
     })
   }
@@ -138,12 +147,21 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
     e.preventDefault()
     if (!selectedEmployee) return
 
+    let toastId: string | number = ""
     resetForm.post(`/admin/employees/${selectedEmployee.id}/reset-password`, {
+      onStart: () => {
+        toastId = toast.loading("Resetting employee password...")
+      },
       onSuccess: () => {
+        toast.dismiss(toastId)
         setIsResetOpen(false)
         resetForm.reset()
         setSelectedEmployee(null)
-        showToast("Employee password reset successfully!")
+        toast.success("Employee password reset successfully!")
+      },
+      onError: () => {
+        toast.dismiss(toastId)
+        toast.error("Failed to reset password.")
       },
     })
   }
@@ -153,20 +171,22 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
     e.preventDefault()
     if (!selectedEmployee) return
 
+    let toastId: string | number = ""
     router.delete(`/admin/employees/${selectedEmployee.id}`, {
+      onStart: () => {
+        toastId = toast.loading("Deleting employee account...")
+      },
       onSuccess: () => {
+        toast.dismiss(toastId)
         setIsDeleteOpen(false)
         setSelectedEmployee(null)
-        showToast("Employee account successfully deleted.")
+        toast.success("Employee account successfully deleted.")
+      },
+      onError: () => {
+        toast.dismiss(toastId)
+        toast.error("Failed to delete employee account.")
       },
     })
-  }
-
-  const showToast = (message: string) => {
-    setSuccessToast(message)
-    setTimeout(() => {
-      setSuccessToast(null)
-    }, 4000)
   }
 
   // Calculate high-fidelity stats cards values
@@ -211,13 +231,6 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
 
   return (
     <AppLayout breadcrumbs={[{ title: "Admin Console" }, { title: "Employee Registry" }]}>
-      {/* Toast Notification */}
-      {successToast && (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl bg-[#00472e] p-4 text-white shadow-xl animate-in slide-in-from-top-4 duration-300">
-          <CheckCircle2 className="h-5 w-5 text-amber-400" />
-          <span className="text-sm font-semibold">{successToast}</span>
-        </div>
-      )}
 
       {/* Hero / Header Section */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

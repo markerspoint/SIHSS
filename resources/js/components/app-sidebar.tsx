@@ -144,10 +144,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" className="border-r border-slate-200 bg-white" {...props}>
       {/* Brand Header */}
-      <SidebarHeader className="border-b border-slate-100 py-4 px-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#00472e] text-white shadow-md shrink-0">
-            <Building2 className="h-5 w-5 text-amber-400" />
+      <SidebarHeader className="border-b border-slate-100 py-4 px-3 group-data-[state=collapsed]:px-1.5">
+        <div className="flex items-center gap-3 group-data-[state=collapsed]:gap-0 group-data-[state=collapsed]:justify-center transition-all duration-200">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-white shadow-sm border border-slate-100 p-0.5 shrink-0">
+            <img
+              src="/img/logo.png"
+              alt="SIHSS Logo"
+              className="h-full w-full object-contain"
+            />
           </div>
           {state !== "collapsed" && (
             <div className="flex flex-col text-left animate-in fade-in duration-200">
