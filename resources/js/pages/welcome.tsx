@@ -1,10 +1,23 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import React, { useState } from 'react';
 
 export default function Welcome() {
     const [showLogin, setShowLogin] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [comingSoon, setComingSoon] = useState<string | null>(null);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        employee_id: '',
+        password: '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/login', {
+            onError: () => reset('password'),
+        });
+    };
+
     return (
         <>
             <Head title="SIHSS Portal Gateway" />
@@ -100,7 +113,7 @@ export default function Welcome() {
                                     </div>
                                 </>
                             ) : (
-                                <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+                                <form onSubmit={handleSubmit} className="space-y-5">
                                     <div className="mb-6 text-center">
                                         <h3 className="text-3xl font-semibold tracking-tight text-slate-800">
                                             Hi, Sipalayanon
@@ -115,15 +128,29 @@ export default function Welcome() {
                                             <input
                                                 type="text"
                                                 placeholder="Employee ID number"
-                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm focus:border-[#187e52] focus:bg-white focus:outline-none transition-all text-slate-800 placeholder-slate-400"
+                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm focus:border-[#187e52] focus:bg-white focus:outline-none transition-all text-slate-800 placeholder-slate-400 font-semibold"
+                                                value={data.employee_id}
+                                                onChange={(e) => setData('employee_id', e.target.value)}
                                             />
+                                            {errors.employee_id && (
+                                                <p className="mt-1.5 text-xs text-red-500 font-semibold pl-1">
+                                                    {errors.employee_id}
+                                                </p>
+                                            )}
                                         </div>
                                         <div>
                                             <input
                                                 type={passwordVisible ? 'text' : 'password'}
                                                 placeholder="Password"
                                                 className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm focus:border-[#187e52] focus:bg-white focus:outline-none transition-all text-slate-800 placeholder-slate-400"
+                                                value={data.password}
+                                                onChange={(e) => setData('password', e.target.value)}
                                             />
+                                            {errors.password && (
+                                                <p className="mt-1.5 text-xs text-red-500 font-semibold pl-1">
+                                                    {errors.password}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -139,6 +166,10 @@ export default function Welcome() {
                                         </label>
                                         <a
                                             href="#forgot"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                alert("Please contact the system administrator to reset your password.");
+                                            }}
                                             className="text-[#0d6efd] hover:underline font-semibold"
                                         >
                                             Forgot Password?
@@ -148,16 +179,20 @@ export default function Welcome() {
                                     <div className="pt-2">
                                         <button
                                             type="submit"
-                                            className="w-full cursor-pointer rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none"
+                                            disabled={processing}
+                                            className="w-full cursor-pointer rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Login
+                                            {processing ? 'Signing in...' : 'Login'}
                                         </button>
                                     </div>
 
                                     <div className="text-center pt-2">
                                         <button
                                             type="button"
-                                            onClick={() => setShowLogin(false)}
+                                            onClick={() => {
+                                                setShowLogin(false);
+                                                reset();
+                                            }}
                                             className="cursor-pointer text-sm font-semibold text-slate-600 hover:text-slate-800 hover:underline focus:outline-none"
                                         >
                                             Back to main page
@@ -178,3 +213,4 @@ export default function Welcome() {
         </>
     );
 }
+
