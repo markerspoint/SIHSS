@@ -29,7 +29,7 @@ class AuthController extends Controller
                 return redirect()->intended('/admin/dashboard');
             }
             
-            // For other roles (nurse, jo, doctor), return to gateway home for now
+            // For other roles (medical, jo), return to gateway home for now
             return redirect()->intended('/');
         }
 

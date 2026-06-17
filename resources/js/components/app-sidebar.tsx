@@ -72,32 +72,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             },
           ],
         }
-      case 'doctor':
+      case 'medical':
         return {
           label: "Medical Portal",
-          items: [
-            {
-              title: "Patient Consultations",
-              url: "#",
-              icon: ClipboardList,
-              isActive: true,
-            },
-            {
-              title: "Consultation History",
-              url: "#",
-              icon: History,
-            },
-          ],
-        }
-      case 'nurse':
-        return {
-          label: "Nursing Station",
           items: [
             {
               title: "Triage Desk",
               url: "#",
               icon: HeartPulse,
               isActive: true,
+            },
+            {
+              title: "Patient Consultations",
+              url: "#",
+              icon: ClipboardList,
+            },
+            {
+              title: "Consultation History",
+              url: "#",
+              icon: History,
             },
             {
               title: "Inventory Control",

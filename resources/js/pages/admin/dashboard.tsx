@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react"
-import { useForm, router, usePage } from "@inertiajs/react"
+import React from "react"
+import { usePage } from "@inertiajs/react"
 import AppLayout from "@/layouts/AppLayout"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -26,208 +25,46 @@ import {
   Search,
   UserPlus,
   KeyRound,
-  ShieldCheck,
-  Stethoscope,
-  Heart,
   ClipboardList,
   RefreshCw,
-  CheckCircle2,
   Trash2,
+  Eye,
+  Stethoscope,
 } from "lucide-react"
 
-interface Employee {
-  id: number
-  employee_id: string
-  name: string
-  role: 'admin' | 'doctor' | 'nurse' | 'jo'
-  created_at: string
-}
-
-interface DashboardProps {
-  employees: Employee[]
-  filters: {
-    search: string
-  }
-}
+import { DashboardProps } from "./types"
+import { getRoleBadge, generateRandomPassword, generateRandomEmployeeId } from "./utils/helpers"
+import { useAdminDashboard } from "./hooks/useAdminDashboard"
 
 export default function Dashboard({ employees, filters }: DashboardProps) {
   const { props: pageProps } = usePage()
   const auth = pageProps.auth as unknown as { user: { id: number; name: string; employee_id: string; role: string } } | undefined
   const currentUser = auth?.user
 
-  const [searchTerm, setSearchTerm] = useState(filters.search || "")
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isResetOpen, setIsResetOpen] = useState(false)
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
-
-  // Form handling for new employee generation
-  const createForm = useForm({
-    employee_id: "",
-    name: "",
-    role: "jo",
-    password: "",
-  })
-
-  // Form handling for password resetting
-  const resetForm = useForm({
-    password: "",
-  })
-
-  // Auto-generate random secure password (4 numbers and 1 letter)
-  const generateRandomPassword = () => {
-    const numbers = "0123456789"
-    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    let pass = ""
-    for (let i = 0; i < 4; i++) {
-      pass += numbers.charAt(Math.floor(Math.random() * numbers.length))
-    }
-    pass += letters.charAt(Math.floor(Math.random() * letters.length))
-    return pass
-  }
-
-  // Auto-generate random Employee ID
-  const generateRandomEmployeeId = () => {
-    const year = new Date().getFullYear()
-    const rand = Math.floor(100 + Math.random() * 900)
-    return `EMP-${year}-${rand}`
-  }
-
-  // Pre-fill generated password or auto-generate when modal opens
-  useEffect(() => {
-    if (isCreateOpen) {
-      if (!createForm.data.password) {
-        createForm.setData("password", generateRandomPassword())
-      }
-      if (!createForm.data.employee_id) {
-        createForm.setData("employee_id", generateRandomEmployeeId())
-      }
-    }
-  }, [isCreateOpen])
-
-  // Handle live search with debounced effect
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      router.get(
-        "/admin/dashboard",
-        { search: searchTerm },
-        {
-          preserveState: true,
-          replace: true,
-        }
-      )
-    }, 300)
-
-    return () => clearTimeout(delayDebounceFn)
-  }, [searchTerm])
-
-  // Handle employee account generation submit
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    let toastId: string | number = ""
-    createForm.post("/admin/employees", {
-      onStart: () => {
-        toastId = toast.loading("Generating employee account...")
-      },
-      onSuccess: () => {
-        toast.dismiss(toastId)
-        setIsCreateOpen(false)
-        createForm.reset()
-        toast.success("Employee account generated successfully!")
-      },
-      onError: () => {
-        toast.dismiss(toastId)
-        toast.error("Failed to generate employee account.")
-      },
-    })
-  }
-
-  // Handle password reset submit
-  const handleResetSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedEmployee) return
-
-    let toastId: string | number = ""
-    resetForm.post(`/admin/employees/${selectedEmployee.id}/reset-password`, {
-      onStart: () => {
-        toastId = toast.loading("Resetting employee password...")
-      },
-      onSuccess: () => {
-        toast.dismiss(toastId)
-        setIsResetOpen(false)
-        resetForm.reset()
-        setSelectedEmployee(null)
-        toast.success("Employee password reset successfully!")
-      },
-      onError: () => {
-        toast.dismiss(toastId)
-        toast.error("Failed to reset password.")
-      },
-    })
-  }
-
-  // Handle employee account deletion
-  const handleDeleteSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedEmployee) return
-
-    let toastId: string | number = ""
-    router.delete(`/admin/employees/${selectedEmployee.id}`, {
-      onStart: () => {
-        toastId = toast.loading("Deleting employee account...")
-      },
-      onSuccess: () => {
-        toast.dismiss(toastId)
-        setIsDeleteOpen(false)
-        setSelectedEmployee(null)
-        toast.success("Employee account successfully deleted.")
-      },
-      onError: () => {
-        toast.dismiss(toastId)
-        toast.error("Failed to delete employee account.")
-      },
-    })
-  }
+  const {
+    searchTerm,
+    setSearchTerm,
+    isCreateOpen,
+    setIsCreateOpen,
+    isResetOpen,
+    setIsResetOpen,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    isViewOpen,
+    setIsViewOpen,
+    selectedEmployee,
+    setSelectedEmployee,
+    createForm,
+    resetForm,
+    handleCreateSubmit,
+    handleResetSubmit,
+    handleDeleteSubmit,
+  } = useAdminDashboard(filters.search)
 
   // Calculate high-fidelity stats cards values
   const totalStaff = employees.length
-  const doctorsCount = employees.filter((e) => e.role === "doctor").length
-  const nursesCount = employees.filter((e) => e.role === "nurse").length
+  const medicalCount = employees.filter((e) => e.role === "medical").length
   const joCount = employees.filter((e) => e.role === "jo").length
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case "admin":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-800 border border-slate-200">
-            <ShieldCheck className="h-3.5 w-3.5 text-slate-600" />
-            Admin
-          </span>
-        )
-      case "doctor":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 border border-indigo-100">
-            <Stethoscope className="h-3.5 w-3.5 text-indigo-600" />
-            Doctor
-          </span>
-        )
-      case "nurse":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-xs font-semibold text-teal-700 border border-teal-100">
-            <Heart className="h-3.5 w-3.5 text-teal-600" />
-            Nurse
-          </span>
-        )
-      case "jo":
-      default:
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-100">
-            <ClipboardList className="h-3.5 w-3.5 text-amber-600" />
-            Job Order
-          </span>
-        )
-    }
-  }
 
   return (
     <AppLayout breadcrumbs={[{ title: "Admin Console" }, { title: "Employee Registry" }]}>
@@ -304,15 +141,14 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                 <Label htmlFor="role" className="text-xs font-bold text-slate-600">System Access Role</Label>
                 <Select
                   value={createForm.data.role}
-                  onValueChange={(val) => createForm.setData("role", val)}
+                  onValueChange={(val) => createForm.setData("role", val as "admin" | "medical" | "jo")}
                 >
                   <SelectTrigger id="role" className="rounded-xl border-slate-200 bg-slate-50/50 text-sm">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     <SelectItem value="jo">Job Order (Staff)</SelectItem>
-                    <SelectItem value="nurse">Nurse</SelectItem>
-                    <SelectItem value="doctor">Medical Doctor</SelectItem>
+                    <SelectItem value="medical">Medical</SelectItem>
                     <SelectItem value="admin">Administrator</SelectItem>
                   </SelectContent>
                 </Select>
@@ -369,7 +205,7 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
       </div>
 
       {/* STATISTICS CARDS GRID */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         {/* Card: Total Staff */}
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
@@ -381,25 +217,14 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
           </div>
         </div>
 
-        {/* Card: Doctors */}
+        {/* Card: Medical Staff */}
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Doctors</span>
-            <h3 className="text-3xl font-extrabold text-slate-900">{doctorsCount}</h3>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Medical Staff</span>
+            <h3 className="text-3xl font-extrabold text-slate-900">{medicalCount}</h3>
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700">
             <Stethoscope className="h-6 w-6" />
-          </div>
-        </div>
-
-        {/* Card: Nurses */}
-        <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nurses</span>
-            <h3 className="text-3xl font-extrabold text-slate-900">{nursesCount}</h3>
-          </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
-            <Heart className="h-6 w-6" />
           </div>
         </div>
 
@@ -465,6 +290,18 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                       })}
                     </td>
                     <td className="py-3.5 px-4 text-right flex items-center justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                        onClick={() => {
+                          setSelectedEmployee(emp)
+                          setIsViewOpen(true)
+                        }}
+                      >
+                        <Eye className="h-3.5 w-3.5 text-slate-500" />
+                        View
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -609,6 +446,94 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
               className="rounded-xl bg-red-600 hover:bg-red-800 text-white font-semibold cursor-pointer"
             >
               Delete Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* VIEW DETAILS DIALOG */}
+      <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-[1.5rem] p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-800">Employee Profile</DialogTitle>
+            <DialogDescription className="text-slate-500 text-xs mt-1">
+              Detailed metadata and role permissions.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedEmployee && (
+            <div className="space-y-6 py-4">
+              {/* Profile Avatar and Name */}
+              <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-[#187e52] font-bold text-xl border border-emerald-100">
+                  {selectedEmployee.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .substring(0, 2)}
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-lg font-bold text-slate-900 leading-tight">{selectedEmployee.name}</h4>
+                  <div>{getRoleBadge(selectedEmployee.role)}</div>
+                </div>
+              </div>
+
+              {/* Data list */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-sm py-2 border-b border-slate-50">
+                  <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">Employee ID</span>
+                  <span className="font-mono text-slate-900 font-bold bg-slate-50 px-2.5 py-0.5 rounded-lg border border-slate-200/60">
+                    {selectedEmployee.employee_id}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center text-sm py-2 border-b border-slate-50">
+                  <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">Email Address</span>
+                  <span className="text-slate-800 font-semibold">
+                    {selectedEmployee.email || (
+                      <span className="text-slate-400 italic font-medium">No email linked</span>
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center text-sm py-2 border-b border-slate-50">
+                  <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">Created Date</span>
+                  <span className="text-slate-800 font-semibold">
+                    {new Date(selectedEmployee.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+
+                {selectedEmployee.updated_at && (
+                  <div className="flex justify-between items-center text-sm py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">Last Updated</span>
+                    <span className="text-slate-800 font-semibold">
+                      {new Date(selectedEmployee.updated_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="pt-2">
+            <Button
+              type="button"
+              className="rounded-xl bg-slate-950 hover:bg-slate-900 text-white font-semibold cursor-pointer w-full py-5"
+              onClick={() => {
+                setIsViewOpen(false)
+                setSelectedEmployee(null)
+              }}
+            >
+              Close Profile
             </Button>
           </DialogFooter>
         </DialogContent>

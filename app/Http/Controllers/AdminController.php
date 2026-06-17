@@ -41,7 +41,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'employee_id' => ['required', 'string', 'unique:users,employee_id'],
             'name' => ['required', 'string', 'max:255'],
-            'role' => ['required', 'string', Rule::in(['admin', 'doctor', 'nurse', 'jo'])],
+            'role' => ['required', 'string', Rule::in(['admin', 'medical', 'jo'])],
             'password' => ['required', 'string', 'min:4'],
         ]);
 

@@ -50,10 +50,8 @@ export function NavUser({
     switch (role) {
       case 'admin':
         return 'Administrator'
-      case 'doctor':
-        return 'Medical Doctor'
-      case 'nurse':
-        return 'Nurse practitioner'
+      case 'medical':
+        return 'Medical Staff'
       case 'jo':
         return 'Job Order Staff'
       default:
