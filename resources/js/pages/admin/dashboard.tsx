@@ -1,25 +1,4 @@
-import React from "react"
 import { usePage } from "@inertiajs/react"
-import AppLayout from "@/layouts/AppLayout"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import {
   Users,
   Search,
@@ -31,10 +10,31 @@ import {
   Eye,
   Stethoscope,
 } from "lucide-react"
+import React from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import AppLayout from "@/layouts/AppLayout"
 
-import { DashboardProps } from "./types"
-import { getRoleBadge, generateRandomPassword, generateRandomEmployeeId } from "./utils/helpers"
 import { useAdminDashboard } from "./hooks/useAdminDashboard"
+import type { DashboardProps } from "./types"
+import { getRoleBadge, generateRandomPassword, generateRandomEmployeeId } from "./utils/helpers"
 
 export default function Dashboard({ employees, filters }: DashboardProps) {
   const { props: pageProps } = usePage()

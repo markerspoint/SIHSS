@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import React, { useState } from 'react';
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function Welcome() {
     const [showLogin, setShowLogin] = useState(false);

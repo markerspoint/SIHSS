@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react"
 import { useForm, router } from "@inertiajs/react"
+import type React from "react";
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
-import { Employee } from "../types"
+import type { Employee } from "../types"
 import { generateRandomPassword, generateRandomEmployeeId } from "../utils/helpers"
 
 export function useAdminDashboard(initialSearch: string) {
@@ -36,6 +37,7 @@ export function useAdminDashboard(initialSearch: string) {
       if (!createForm.data.password) {
         createForm.setData("password", generateRandomPassword())
       }
+
       if (!createForm.data.employee_id) {
         createForm.setData("employee_id", generateRandomEmployeeId())
       }
@@ -82,7 +84,10 @@ export function useAdminDashboard(initialSearch: string) {
   // Handle password reset submit
   const handleResetSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedEmployee) return
+
+    if (!selectedEmployee) {
+return
+}
 
     let toastId: string | number = ""
     resetForm.post(`/admin/employees/${selectedEmployee.id}/reset-password`, {
@@ -106,7 +111,10 @@ export function useAdminDashboard(initialSearch: string) {
   // Handle employee account deletion
   const handleDeleteSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedEmployee) return
+
+    if (!selectedEmployee) {
+return
+}
 
     let toastId: string | number = ""
     router.delete(`/admin/employees/${selectedEmployee.id}`, {

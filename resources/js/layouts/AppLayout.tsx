@@ -14,8 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -27,7 +27,7 @@ export default function AppLayout({ children, breadcrumbs }: AppLayoutProps) {
     <TooltipProvider>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="bg-[#f8fafc]">
+        <SidebarInset className="bg-[#f8fafc] flex flex-col h-screen overflow-hidden">
           {/* Header Area */}
           <header className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-100 bg-white px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export default function AppLayout({ children, breadcrumbs }: AppLayoutProps) {
           </header>
 
           {/* Core Content Viewport */}
-          <main className="flex flex-1 flex-col gap-6 p-6 md:p-8">
+          <main className="flex flex-1 flex-col gap-6 p-6 md:p-8 overflow-y-auto">
             {children}
           </main>
         </SidebarInset>

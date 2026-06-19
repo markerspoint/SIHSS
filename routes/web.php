@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MedicalController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -13,4 +14,13 @@ Route::middleware(['auth', 'admin', 'prevent-back'])->group(function () {
     Route::post('/admin/employees', [AdminController::class, 'store'])->name('admin.employees.store');
     Route::post('/admin/employees/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('admin.employees.reset-password');
     Route::delete('/admin/employees/{id}', [AdminController::class, 'destroy'])->name('admin.employees.destroy');
+});
+
+Route::middleware(['auth', 'medical', 'prevent-back'])->group(function () {
+    Route::get('/medical/dashboard', [MedicalController::class, 'dashboard'])->name('medical.dashboard');
+    Route::get('/medical/geotagging', [MedicalController::class, 'geotagging'])->name('medical.geotagging');
+    Route::post('/medical/geotagging', [MedicalController::class, 'storePatient'])->name('medical.geotagging.store');
+    Route::delete('/medical/geotagging/{id}', [MedicalController::class, 'deletePatient'])->name('medical.geotagging.delete');
+    Route::get('/medical/patients-tagged', [MedicalController::class, 'patientsTagged'])->name('medical.patients-tagged');
+    Route::get('/medical/patient-records', [MedicalController::class, 'patientRecords'])->name('medical.patient-records');
 });

@@ -1,15 +1,18 @@
-import React from "react"
 import { ShieldCheck, Stethoscope, ClipboardList } from "lucide-react"
+import React from "react"
 
 // Auto-generate random secure password (4 numbers and 1 letter)
 export const generateRandomPassword = () => {
   const numbers = "0123456789"
   const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   let pass = ""
+
   for (let i = 0; i < 4; i++) {
     pass += numbers.charAt(Math.floor(Math.random() * numbers.length))
   }
+
   pass += letters.charAt(Math.floor(Math.random() * letters.length))
+
   return pass
 }
 
@@ -17,6 +20,7 @@ export const generateRandomPassword = () => {
 export const generateRandomEmployeeId = () => {
   const year = new Date().getFullYear()
   const rand = Math.floor(100 + Math.random() * 900)
+
   return `EMP-${year}-${rand}`
 }
 

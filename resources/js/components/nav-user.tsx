@@ -1,3 +1,5 @@
+import { router } from "@inertiajs/react"
+import { ChevronsUpDownIcon, BadgeCheckIcon, BellIcon, LogOutIcon, UserIcon } from "lucide-react"
 import {
   Avatar,
   AvatarFallback,
@@ -18,8 +20,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { router } from "@inertiajs/react"
-import { ChevronsUpDownIcon, BadgeCheckIcon, BellIcon, LogOutIcon, UserIcon } from "lucide-react"
 
 export function NavUser({
   user,
