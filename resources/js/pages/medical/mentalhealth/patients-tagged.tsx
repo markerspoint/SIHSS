@@ -6,8 +6,7 @@ import {
   HeartPulse,
   Info,
 } from "lucide-react"
-import type maplibregl from "maplibre-gl"
-import React, { useState, useEffect, useRef } from "react"
+import React from "react"
 import { Card } from "@/components/ui/card"
 import {
   Map,
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { usePatientsTaggedHook } from "@/hooks/patients-tagged-hook"
 import AppLayout from "@/layouts/AppLayout"
 import type { PatientRecord } from "@/types/patient-records-types"
 
@@ -32,26 +32,13 @@ export default function PatientsTagged() {
   const { props } = usePage()
   const { patients = [] } = props as unknown as { patients: PatientRecord[] }
 
-  const [selectedCondition, setSelectedCondition] = useState("ALL")
-
-  // MapRef to fly map to coordinates
-  const mapRef = useRef<maplibregl.Map | null>(null)
-
-  // Filter patients
-  const filteredPatients = selectedCondition === "ALL"
-    ? patients
-    : patients.filter(p => p.condition === selectedCondition)
-
-  // Fly to the first matched patient on filter change
-  useEffect(() => {
-    if (filteredPatients.length > 0 && mapRef.current) {
-      mapRef.current.flyTo({
-        center: [filteredPatients[0].lng, filteredPatients[0].lat],
-        zoom: 13,
-        speed: 0.5
-      })
-    }
-  }, [filteredPatients])
+  const {
+    selectedCondition,
+    setSelectedCondition,
+    mapRef,
+    filteredPatients,
+    flyToPatient,
+  } = usePatientsTaggedHook(patients)
 
   return (
     <>
@@ -174,15 +161,7 @@ export default function PatientsTagged() {
                   filteredPatients.map(p => (
                     <button
                       key={p.id}
-                      onClick={() => {
-                        if (mapRef.current) {
-                          mapRef.current.flyTo({
-                            center: [p.lng, p.lat],
-                            zoom: 15,
-                            speed: 0.8
-                          })
-                        }
-                      }}
+                      onClick={() => flyToPatient(p)}
                       className="w-full text-left p-2.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-100 rounded-lg text-xs transition-colors flex flex-col gap-1 cursor-pointer"
                     >
                       <span className="font-bold text-slate-800 truncate">{p.name}</span>
