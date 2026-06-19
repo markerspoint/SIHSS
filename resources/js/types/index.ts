@@ -1,3 +1,3 @@
 export type * from './auth';
-export type * from './geotag-types';
+export type * from './patient-records-types';
 

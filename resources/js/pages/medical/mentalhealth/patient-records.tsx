@@ -9,50 +9,27 @@ import {
   User,
   Info,
 } from "lucide-react"
-import React, { useState } from "react"
+import React from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { usePatientRecordsHook } from "@/hooks/patient-records-hook"
 import AppLayout from "@/layouts/AppLayout"
-import type { PatientRecord } from "@/types/geotag-types"
+import type { PatientRecord } from "@/types/patient-records-types"
 
 export default function PatientRecords() {
   const { props } = usePage()
   const { patients = [] } = props as unknown as { patients: PatientRecord[] }
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
-    patients.length > 0 ? patients[0].id : null
-  )
-
-  // Filter patients by search
-  const filteredPatients = patients.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.condition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.address.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  // Get active patient object
-  const activePatient = patients.find((p) => p.id === selectedPatientId) || null
-
-  // Delete Patient handler
-  const handleDeletePatient = (id: number, name: string) => {
-    if (confirm(`Are you sure you want to delete the record of ${name}? This action cannot be undone.`)) {
-      router.delete(`/medical/geotagging/${id}`, {
-        onSuccess: () => {
-          alert("Patient record deleted successfully.")
-
-          if (selectedPatientId === id) {
-            setSelectedPatientId(patients.length > 0 ? patients[0].id : null)
-          }
-        },
-        onError: (errors) => {
-          alert(Object.values(errors).join("\n"))
-        }
-      })
-    }
-  }
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedPatientId,
+    setSelectedPatientId,
+    filteredPatients,
+    activePatient,
+    handleDeletePatient,
+  } = usePatientRecordsHook(patients)
 
   return (
     <>

@@ -12,7 +12,7 @@ import {
 import React from "react"
 import { Card } from "@/components/ui/card"
 import AppLayout from "@/layouts/AppLayout"
-import type { PatientRecord } from "@/types/geotag-types"
+import type { PatientRecord } from "@/types/patient-records-types"
 
 interface ConditionStat {
   condition: string

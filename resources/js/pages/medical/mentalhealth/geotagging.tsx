@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select"
 import { useGeotagHook } from "@/hooks/geotag-hook"
 import AppLayout from "@/layouts/AppLayout"
-import type { PatientRecord } from "@/types/geotag-types"
+import type { PatientRecord } from "@/types/patient-records-types"
 
 // Helper component to listen to map click events using mapcn's context
 function MapClickObserver({ onClick }: { onClick: (coords: maplibregl.LngLat) => void }) {

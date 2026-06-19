@@ -3,7 +3,7 @@ import type maplibregl from "maplibre-gl"
 import type React from "react";
 import { useState, useEffect, useRef, useMemo } from "react"
 import { reverseGeocode } from "@/lib/geotag-utils"
-import type { PatientRecord } from "@/types/geotag-types"
+import type { PatientRecord } from "@/types/patient-records-types"
 
 export function useGeotagHook(initialPatients: PatientRecord[] = []) {
   const [searchTerm, setSearchTerm] = useState("")

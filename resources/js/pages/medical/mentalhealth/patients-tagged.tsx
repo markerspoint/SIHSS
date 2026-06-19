@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import AppLayout from "@/layouts/AppLayout"
-import type { PatientRecord } from "@/types/geotag-types"
+import type { PatientRecord } from "@/types/patient-records-types"
 
 export default function PatientsTagged() {
   const { props } = usePage()
