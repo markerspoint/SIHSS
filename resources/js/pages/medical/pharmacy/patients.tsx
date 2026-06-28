@@ -15,29 +15,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import AppLayout from "@/layouts/AppLayout"
 
-interface MedicationLog {
-  id: number
-  generic_name: string
-  dosage: string
-  form: string
-  quantity_dispensed: number
-  notes: string | null
-  date: string
-}
-
-interface PatientHistory {
-  name: string
-  first_name: string
-  middle_name: string | null
-  last_name: string
-  suffix: string | null
-  age: number
-  civil_status: string
-  birthdate: string
-  barangay: string
-  last_visit: string
-  history: MedicationLog[]
-}
+import { MedicationLog, PatientHistory } from "@/types/pharmacytypes"
 
 export default function Patients() {
   const { props } = usePage()
