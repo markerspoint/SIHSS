@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\CheckAdmin::class,
             'medical' => \App\Http\Middleware\CheckMedical::class,
+            'module' => \App\Http\Middleware\CheckModuleAccess::class,
             'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })

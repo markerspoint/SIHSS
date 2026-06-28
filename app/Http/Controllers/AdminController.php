@@ -43,6 +43,7 @@ class AdminController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'role' => ['required', 'string', Rule::in(['admin', 'medical', 'jo'])],
             'password' => ['required', 'string', 'min:4'],
+            'accessible_modules' => ['nullable', 'array'],
         ]);
 
         User::create([
@@ -50,9 +51,32 @@ class AdminController extends Controller
             'name' => $validated['name'],
             'role' => $validated['role'],
             'password' => Hash::make($validated['password']),
+            'accessible_modules' => $validated['accessible_modules'] ?? [],
         ]);
 
         return redirect()->back()->with('success', 'Employee account successfully generated.');
+    }
+
+    /**
+     * Update an employee's details and permissions.
+     */
+    public function update(Request $request, string $id): \Illuminate\Http\RedirectResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'role' => ['required', 'string', Rule::in(['admin', 'medical', 'jo'])],
+            'accessible_modules' => ['nullable', 'array'],
+        ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'role' => $validated['role'],
+            'accessible_modules' => $validated['role'] === 'medical' ? ($validated['accessible_modules'] ?? []) : [],
+        ]);
+
+        return redirect()->back()->with('success', 'Employee account successfully updated.');
     }
 
     /**

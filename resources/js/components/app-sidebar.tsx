@@ -80,34 +80,49 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         }
       case 'medical':
+        const modules = user.accessible_modules || [];
+        const medicalItems: NavItem[] = [
+          {
+            title: "Dashboard",
+            url: "/medical/dashboard",
+            icon: LayoutDashboard,
+          },
+        ];
+
+        if (user.role === 'admin' || modules.includes('mental_health')) {
+          medicalItems.push({
+            title: "Mental Health",
+            url: "#",
+            icon: HeartPulse,
+            items: [
+              {
+                title: "Geotagging",
+                url: "/medical/geotagging",
+              },
+              {
+                title: "Patients Tagged",
+                url: "/medical/patients-tagged",
+              },
+              {
+                title: "Patient Records",
+                url: "/medical/patient-records",
+              },
+            ],
+          });
+        }
+
+        if (user.role === 'admin' || modules.includes('pharmacy_inventory')) {
+          medicalItems.push({
+            title: "Pharmacy Inventory",
+            url: "#",
+            icon: Layers,
+            comingSoon: true,
+          });
+        }
+
         return {
           label: "Medical Portal",
-          items: [
-            {
-              title: "Dashboard",
-              url: "/medical/dashboard",
-              icon: LayoutDashboard,
-            },
-            {
-              title: "Mental Health",
-              url: "#",
-              icon: HeartPulse,
-              items: [
-                {
-                  title: "Geotagging",
-                  url: "/medical/geotagging",
-                },
-                {
-                  title: "Patients Tagged",
-                  url: "/medical/patients-tagged",
-                },
-                {
-                  title: "Patient Records",
-                  url: "/medical/patient-records",
-                },
-              ],
-            },
-          ],
+          items: medicalItems,
         }
       case 'jo':
       default:

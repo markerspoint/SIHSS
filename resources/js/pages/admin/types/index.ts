@@ -4,6 +4,7 @@ export interface Employee {
   name: string
   role: 'admin' | 'medical' | 'jo'
   email?: string | null
+  accessible_modules?: string[]
   created_at: string
   updated_at?: string
 }

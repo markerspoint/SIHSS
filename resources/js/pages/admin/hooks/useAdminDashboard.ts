@@ -8,6 +8,7 @@ import { generateRandomPassword, generateRandomEmployeeId } from "../utils/helpe
 export function useAdminDashboard(initialSearch: string) {
   const [searchTerm, setSearchTerm] = useState(initialSearch || "")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isViewOpen, setIsViewOpen] = useState(false)
@@ -19,11 +20,24 @@ export function useAdminDashboard(initialSearch: string) {
     name: string
     role: "admin" | "medical" | "jo"
     password: string
+    accessible_modules: string[]
   }>({
     employee_id: "",
     name: "",
     role: "jo",
     password: "",
+    accessible_modules: [],
+  })
+
+  // Form handling for editing employee account
+  const editForm = useForm<{
+    name: string
+    role: "admin" | "medical" | "jo"
+    accessible_modules: string[]
+  }>({
+    name: "",
+    role: "jo",
+    accessible_modules: [],
   })
 
   // Form handling for password resetting
@@ -135,11 +149,40 @@ return
     })
   }
 
+  // Handle employee account update submit
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!selectedEmployee) {
+      return
+    }
+
+    let toastId: string | number = ""
+    editForm.put(`/admin/employees/${selectedEmployee.id}`, {
+      onStart: () => {
+        toastId = toast.loading("Updating employee account...")
+      },
+      onSuccess: () => {
+        toast.dismiss(toastId)
+        setIsEditOpen(false)
+        editForm.reset()
+        setSelectedEmployee(null)
+        toast.success("Employee account updated successfully!")
+      },
+      onError: () => {
+        toast.dismiss(toastId)
+        toast.error("Failed to update employee account.")
+      },
+    })
+  }
+
   return {
     searchTerm,
     setSearchTerm,
     isCreateOpen,
     setIsCreateOpen,
+    isEditOpen,
+    setIsEditOpen,
     isResetOpen,
     setIsResetOpen,
     isDeleteOpen,
@@ -149,8 +192,10 @@ return
     selectedEmployee,
     setSelectedEmployee,
     createForm,
+    editForm,
     resetForm,
     handleCreateSubmit,
+    handleEditSubmit,
     handleResetSubmit,
     handleDeleteSubmit,
   }

@@ -9,6 +9,7 @@ import {
   Trash2,
   Eye,
   Stethoscope,
+  Pencil,
 } from "lucide-react"
 import React from "react"
 import { Button } from "@/components/ui/button"
@@ -46,6 +47,8 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
     setSearchTerm,
     isCreateOpen,
     setIsCreateOpen,
+    isEditOpen,
+    setIsEditOpen,
     isResetOpen,
     setIsResetOpen,
     isDeleteOpen,
@@ -55,8 +58,10 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
     selectedEmployee,
     setSelectedEmployee,
     createForm,
+    editForm,
     resetForm,
     handleCreateSubmit,
+    handleEditSubmit,
     handleResetSubmit,
     handleDeleteSubmit,
   } = useAdminDashboard(filters.search)
@@ -141,7 +146,14 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                 <Label htmlFor="role" className="text-xs font-bold text-slate-600">System Access Role</Label>
                 <Select
                   value={createForm.data.role}
-                  onValueChange={(val) => createForm.setData("role", val as "admin" | "medical" | "jo")}
+                  onValueChange={(val) => {
+                    const selectedRole = val as "admin" | "medical" | "jo";
+                    createForm.setData(data => ({
+                      ...data,
+                      role: selectedRole,
+                      accessible_modules: selectedRole === "medical" ? [] : data.accessible_modules
+                    }));
+                  }}
                 >
                   <SelectTrigger id="role" className="rounded-xl border-slate-200 bg-slate-50/50 text-sm">
                     <SelectValue placeholder="Select a role" />
@@ -156,6 +168,62 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                   <p className="text-xs text-red-500 font-medium">{createForm.errors.role}</p>
                 )}
               </div>
+
+              {createForm.data.role === "medical" && (
+                <div className="space-y-2.5 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl animate-in fade-in duration-200">
+                  <Label className="text-xs font-bold text-slate-700">Accessible Modules</Label>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="create_module_mental_health"
+                        checked={createForm.data.accessible_modules.includes("mental_health")}
+                        onChange={(e) => {
+                          const checked = e.target.checked
+                          const modules = [...createForm.data.accessible_modules]
+                          if (checked) {
+                            modules.push("mental_health")
+                          } else {
+                            const index = modules.indexOf("mental_health")
+                            if (index > -1) modules.splice(index, 1)
+                          }
+                          createForm.setData("accessible_modules", modules)
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                      <Label htmlFor="create_module_mental_health" className="text-xs font-semibold text-slate-600 cursor-pointer">
+                        Mental Health Module (Geotagging, Patient Records)
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="create_module_pharmacy_inventory"
+                        checked={createForm.data.accessible_modules.includes("pharmacy_inventory")}
+                        onChange={(e) => {
+                          const checked = e.target.checked
+                          const modules = [...createForm.data.accessible_modules]
+                          if (checked) {
+                            modules.push("pharmacy_inventory")
+                          } else {
+                            const index = modules.indexOf("pharmacy_inventory")
+                            if (index > -1) modules.splice(index, 1)
+                          }
+                          createForm.setData("accessible_modules", modules)
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                      <Label htmlFor="create_module_pharmacy_inventory" className="text-xs font-semibold text-slate-600 cursor-pointer flex items-center gap-1.5">
+                        Pharmacy Inventory Module
+                        <span className="text-[8px] bg-amber-500/10 text-amber-600 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+                      </Label>
+                    </div>
+                  </div>
+                  {createForm.errors.accessible_modules && (
+                    <p className="text-xs text-red-500 font-medium">{createForm.errors.accessible_modules}</p>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
@@ -308,6 +376,23 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                         className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
                         onClick={() => {
                           setSelectedEmployee(emp)
+                          editForm.setData({
+                            name: emp.name,
+                            role: emp.role,
+                            accessible_modules: emp.accessible_modules || [],
+                          })
+                          setIsEditOpen(true)
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5 text-slate-500" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                        onClick={() => {
+                          setSelectedEmployee(emp)
                           resetForm.setData("password", generateRandomPassword())
                           setIsResetOpen(true)
                         }}
@@ -349,6 +434,139 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
           </table>
         </div>
       </div>
+
+      {/* EDIT ACCOUNT DIALOG */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-[1.5rem] p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-800">Edit Employee Account</DialogTitle>
+            <DialogDescription className="text-slate-500 text-xs mt-1">
+              Update details and module access for <span className="font-bold text-slate-800">{selectedEmployee?.name}</span> (ID: <span className="font-mono text-slate-800 font-bold">{selectedEmployee?.employee_id}</span>).
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleEditSubmit} className="space-y-4 py-4">
+            <div className="space-y-1">
+              <Label htmlFor="edit_name" className="text-xs font-bold text-slate-600">Full Name</Label>
+              <Input
+                id="edit_name"
+                required
+                placeholder="e.g. Jane Doe"
+                className="rounded-xl border-slate-200 bg-slate-50/50 focus:border-[#187e52] focus:bg-white text-sm"
+                value={editForm.data.name}
+                onChange={(e) => editForm.setData("name", e.target.value)}
+              />
+              {editForm.errors.name && (
+                <p className="text-xs text-red-500 font-medium">{editForm.errors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="edit_role" className="text-xs font-bold text-slate-600">System Access Role</Label>
+              <Select
+                value={editForm.data.role}
+                onValueChange={(val) => {
+                  const selectedRole = val as "admin" | "medical" | "jo"
+                  editForm.setData(data => ({
+                    ...data,
+                    role: selectedRole,
+                    accessible_modules: selectedRole === "medical" ? data.accessible_modules : []
+                  }))
+                }}
+              >
+                <SelectTrigger id="edit_role" className="rounded-xl border-slate-200 bg-slate-50/50 text-sm">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="jo">Job Order (Staff)</SelectItem>
+                  <SelectItem value="medical">Medical</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
+                </SelectContent>
+              </Select>
+              {editForm.errors.role && (
+                <p className="text-xs text-red-500 font-medium">{editForm.errors.role}</p>
+              )}
+            </div>
+
+            {editForm.data.role === "medical" && (
+              <div className="space-y-2.5 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl animate-in fade-in duration-200">
+                <Label className="text-xs font-bold text-slate-700">Accessible Modules</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="edit_module_mental_health"
+                      checked={editForm.data.accessible_modules.includes("mental_health")}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        const modules = [...editForm.data.accessible_modules]
+                        if (checked) {
+                          modules.push("mental_health")
+                        } else {
+                          const index = modules.indexOf("mental_health")
+                          if (index > -1) modules.splice(index, 1)
+                        }
+                        editForm.setData("accessible_modules", modules)
+                      }}
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                    />
+                    <Label htmlFor="edit_module_mental_health" className="text-xs font-semibold text-slate-600 cursor-pointer">
+                      Mental Health Module (Geotagging, Patient Records)
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="edit_module_pharmacy_inventory"
+                      checked={editForm.data.accessible_modules.includes("pharmacy_inventory")}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        const modules = [...editForm.data.accessible_modules]
+                        if (checked) {
+                          modules.push("pharmacy_inventory")
+                        } else {
+                          const index = modules.indexOf("pharmacy_inventory")
+                          if (index > -1) modules.splice(index, 1)
+                        }
+                        editForm.setData("accessible_modules", modules)
+                      }}
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                    />
+                    <Label htmlFor="edit_module_pharmacy_inventory" className="text-xs font-semibold text-slate-600 cursor-pointer flex items-center gap-1.5">
+                      Pharmacy Inventory Module
+                      <span className="text-[8px] bg-amber-500/10 text-amber-600 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+                    </Label>
+                  </div>
+                </div>
+                {editForm.errors.accessible_modules && (
+                  <p className="text-xs text-red-500 font-medium">{editForm.errors.accessible_modules}</p>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl cursor-pointer"
+                onClick={() => {
+                  setIsEditOpen(false)
+                  setSelectedEmployee(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={editForm.processing}
+                className="rounded-xl bg-[#187e52] hover:bg-[#136642] text-white font-semibold cursor-pointer"
+              >
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* PASSWORD RESET DIALOG */}
       <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
@@ -518,6 +736,26 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
                         day: "numeric",
                       })}
                     </span>
+                  </div>
+                )}
+
+                {selectedEmployee.role === 'medical' && (
+                  <div className="flex flex-col gap-1.5 py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">Module Permissions</span>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {selectedEmployee.accessible_modules && selectedEmployee.accessible_modules.length > 0 ? (
+                        selectedEmployee.accessible_modules.map((m) => {
+                          const name = m === 'mental_health' ? 'Mental Health' : m === 'pharmacy_inventory' ? 'Pharmacy Inventory' : m;
+                          return (
+                            <span key={m} className="bg-emerald-50 text-[#187e52] border border-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+                              {name}
+                            </span>
+                          );
+                        })
+                      ) : (
+                        <span className="text-slate-400 italic text-xs font-medium">No modules assigned</span>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
