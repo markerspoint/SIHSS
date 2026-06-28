@@ -35,6 +35,7 @@ Route::middleware(['auth', 'medical', 'prevent-back'])->group(function () {
         Route::get('/medical/pharmacy/dispensing', [PharmacyController::class, 'dispensing'])->name('medical.pharmacy.dispensing');
         Route::post('/medical/pharmacy/dispensing', [PharmacyController::class, 'storeDispensation'])->name('medical.pharmacy.dispensing.store');
         Route::delete('/medical/pharmacy/dispensing/{id}', [PharmacyController::class, 'destroyDispensation'])->name('medical.pharmacy.dispensing.destroy');
+        Route::put('/medical/pharmacy/dispensing/{id}', [PharmacyController::class, 'updateDispensation'])->name('medical.pharmacy.dispensing.update');
 
         Route::get('/medical/pharmacy/patients', [PharmacyController::class, 'patients'])->name('medical.pharmacy.patients');
     });

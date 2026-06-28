@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('dispensation_records', function (Blueprint $table) {
             $table->id();
-            $table->string('patient_name');
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('suffix')->nullable();
+            $table->integer('age');
+            $table->string('civil_status');
+            $table->date('birthdate');
+            $table->string('barangay');
             $table->string('generic_name');
             $table->string('dosage');
             $table->string('form');

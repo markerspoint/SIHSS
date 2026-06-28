@@ -27,6 +27,14 @@ interface MedicationLog {
 
 interface PatientHistory {
   name: string
+  first_name: string
+  middle_name: string | null
+  last_name: string
+  suffix: string | null
+  age: number
+  civil_status: string
+  birthdate: string
+  barangay: string
   last_visit: string
   history: MedicationLog[]
 }
@@ -157,16 +165,21 @@ export default function Patients() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{activePatient.name}</h3>
-                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-slate-400" />
-                      Last visit: {new Date(activePatient.last_visit).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 font-semibold">
+                      <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold">
+                        DOB: {new Date(activePatient.birthdate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} &bull; Age: {activePatient.age} &bull; {activePatient.civil_status} &bull; Brgy. {activePatient.barangay}
+                      </span>
+                      <span className="uppercase tracking-wider flex items-center gap-1.5 text-[10px]">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        Last visit: {new Date(activePatient.last_visit).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
