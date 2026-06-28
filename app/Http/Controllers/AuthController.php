@@ -12,7 +12,7 @@ class AuthController extends Controller
     /**
      * Handle user login.
      */
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
         $credentials = $request->validate([
             'employee_id' => ['required', 'string'],
@@ -43,7 +43,7 @@ class AuthController extends Controller
     /**
      * Log the user out of the application.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         Auth::logout();
 

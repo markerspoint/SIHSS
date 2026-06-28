@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class MedicalController extends Controller
 {
-    public function dashboard()
+    public function dashboard(): \Inertia\Response
     {
         $totalTagged = PatientRecord::count();
         $activeCases = PatientRecord::count(); // Simplified for clinical registry mapping
@@ -34,7 +34,7 @@ class MedicalController extends Controller
         ]);
     }
 
-    public function geotagging()
+    public function geotagging(): \Inertia\Response
     {
         $patients = PatientRecord::latest()->get();
         return Inertia::render('medical/mentalhealth/geotagging', [
@@ -42,7 +42,7 @@ class MedicalController extends Controller
         ]);
     }
 
-    public function storePatient(Request $request)
+    public function storePatient(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -57,7 +57,7 @@ class MedicalController extends Controller
         return redirect()->back()->with('success', 'Patient geotagged successfully.');
     }
 
-    public function deletePatient($id)
+    public function deletePatient(string $id): \Illuminate\Http\RedirectResponse
     {
         $patient = PatientRecord::findOrFail($id);
         $patient->delete();
@@ -65,7 +65,7 @@ class MedicalController extends Controller
         return redirect()->back()->with('success', 'Patient record deleted.');
     }
 
-    public function patientsTagged()
+    public function patientsTagged(): \Inertia\Response
     {
         $patients = PatientRecord::latest()->get();
         return Inertia::render('medical/mentalhealth/patients-tagged', [
@@ -73,7 +73,7 @@ class MedicalController extends Controller
         ]);
     }
 
-    public function patientRecords()
+    public function patientRecords(): \Inertia\Response
     {
         $patients = PatientRecord::latest()->get();
         return Inertia::render('medical/mentalhealth/patient-records', [

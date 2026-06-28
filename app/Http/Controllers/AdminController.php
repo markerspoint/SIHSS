@@ -13,7 +13,7 @@ class AdminController extends Controller
     /**
      * Render the admin dashboard.
      */
-    public function index(Request $request)
+    public function index(Request $request): \Inertia\Response
     {
         $search = $request->input('search');
 
@@ -36,7 +36,7 @@ class AdminController extends Controller
     /**
      * Generate a new employee account.
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
             'employee_id' => ['required', 'string', 'unique:users,employee_id'],
@@ -58,7 +58,7 @@ class AdminController extends Controller
     /**
      * Reset an employee's password.
      */
-    public function resetPassword(Request $request, $id)
+    public function resetPassword(Request $request, string $id): \Illuminate\Http\RedirectResponse
     {
         $user = User::findOrFail($id);
 
@@ -76,7 +76,7 @@ class AdminController extends Controller
     /**
      * Delete an employee account.
      */
-    public function destroy($id)
+    public function destroy(string $id): \Illuminate\Http\RedirectResponse
     {
         $user = User::findOrFail($id);
 

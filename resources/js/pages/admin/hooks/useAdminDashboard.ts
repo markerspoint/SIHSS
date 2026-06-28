@@ -42,6 +42,7 @@ export function useAdminDashboard(initialSearch: string) {
         createForm.setData("employee_id", generateRandomEmployeeId())
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCreateOpen])
 
   // Handle live search with debounced effect

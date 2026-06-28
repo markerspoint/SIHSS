@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react"
-import { ChevronsUpDownIcon, BadgeCheckIcon, BellIcon, LogOutIcon, UserIcon } from "lucide-react"
+import { ChevronsUpDownIcon, BellIcon, LogOutIcon, UserIcon } from "lucide-react"
 import {
   Avatar,
   AvatarFallback,

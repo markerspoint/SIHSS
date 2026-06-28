@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import React, { useState } from 'react';
-import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function Welcome() {
     const [showLogin, setShowLogin] = useState(false);
@@ -15,10 +15,12 @@ export default function Welcome() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        let toastId: string | number = "";
+        let toastId: string | number = '';
         post('/login', {
             onStart: () => {
-                toastId = toast.loading("Verifying credentials and logging in...");
+                toastId = toast.loading(
+                    'Verifying credentials and logging in...',
+                );
             },
             onSuccess: () => {
                 toast.dismiss(toastId);
@@ -26,7 +28,9 @@ export default function Welcome() {
             onError: () => {
                 toast.dismiss(toastId);
                 reset('password');
-                toast.error("Authentication failed. Please verify credentials.");
+                toast.error(
+                    'Authentication failed. Please verify credentials.',
+                );
             },
         });
     };
@@ -62,21 +66,38 @@ export default function Welcome() {
                         {/* RIGHT ACTION PORTALS */}
                         <div className="flex flex-col justify-center px-4 py-6 md:w-1/2">
                             {comingSoon ? (
-                                <div className="text-center py-8 px-4 space-y-6">
+                                <div className="space-y-6 px-4 py-8 text-center">
                                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 text-amber-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="h-8 w-8">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth="2.5"
+                                            stroke="currentColor"
+                                            className="h-8 w-8"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
                                         </svg>
                                     </div>
                                     <div className="space-y-2">
-                                        <h3 className="text-2xl font-bold text-slate-800">Coming Soon</h3>
-                                        <p className="text-sm text-slate-500 max-w-[280px] mx-auto">
-                                            The <span className="font-semibold text-emerald-800">{comingSoon}</span> is currently under development.
+                                        <h3 className="text-2xl font-bold text-slate-800">
+                                            Coming Soon
+                                        </h3>
+                                        <p className="mx-auto max-w-[280px] text-sm text-slate-500">
+                                            The{' '}
+                                            <span className="font-semibold text-emerald-800">
+                                                {comingSoon}
+                                            </span>{' '}
+                                            is currently under development.
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => setComingSoon(null)}
-                                        className="px-6 py-2.5 bg-[#187e52] hover:bg-[#136642] text-white text-xs font-semibold rounded-lg shadow transition-all cursor-pointer"
+                                        className="cursor-pointer rounded-lg bg-[#187e52] px-6 py-2.5 text-xs font-semibold text-white shadow transition-all hover:bg-[#136642]"
                                     >
                                         Go Back
                                     </button>
@@ -85,7 +106,7 @@ export default function Welcome() {
                                 <>
                                     <div className="mb-8 text-center">
                                         <h3 className="text-3xl font-semibold tracking-tight text-slate-800">
-                                            Hi, Sipalayanon
+                                            Hi, Sipalaynon
                                         </h3>
                                         <p className="mt-1.5 text-sm text-slate-500">
                                             Select Transaction
@@ -95,7 +116,11 @@ export default function Welcome() {
                                     <div className="space-y-4">
                                         {/* Button: Health Worker Access */}
                                         <button
-                                            onClick={() => setComingSoon('Health Worker Portal')}
+                                            onClick={() =>
+                                                setComingSoon(
+                                                    'Health Worker Portal',
+                                                )
+                                            }
                                             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none"
                                         >
                                             Health Worker
@@ -103,7 +128,11 @@ export default function Welcome() {
 
                                         {/* Button: Lobby Board */}
                                         <button
-                                            onClick={() => setComingSoon('Job Order Portal')}
+                                            onClick={() =>
+                                                setComingSoon(
+                                                    'Job Order Portal',
+                                                )
+                                            }
                                             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none"
                                         >
                                             Job Order
@@ -126,7 +155,10 @@ export default function Welcome() {
                                     </div>
                                 </>
                             ) : (
-                                <form onSubmit={handleSubmit} className="space-y-5">
+                                <form
+                                    onSubmit={handleSubmit}
+                                    className="space-y-5"
+                                >
                                     <div className="mb-6 text-center">
                                         <h3 className="text-3xl font-semibold tracking-tight text-slate-800">
                                             Hi, Sipalayanon
@@ -141,38 +173,56 @@ export default function Welcome() {
                                             <input
                                                 type="text"
                                                 placeholder="Employee ID number"
-                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm focus:border-[#187e52] focus:bg-white focus:outline-none transition-all text-slate-800 placeholder-slate-400 font-semibold"
+                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm font-semibold text-slate-800 placeholder-slate-400 transition-all focus:border-[#187e52] focus:bg-white focus:outline-none"
                                                 value={data.employee_id}
-                                                onChange={(e) => setData('employee_id', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'employee_id',
+                                                        e.target.value,
+                                                    )
+                                                }
                                             />
                                             {errors.employee_id && (
-                                                <p className="mt-1.5 text-xs text-red-500 font-semibold pl-1">
+                                                <p className="mt-1.5 pl-1 text-xs font-semibold text-red-500">
                                                     {errors.employee_id}
                                                 </p>
                                             )}
                                         </div>
                                         <div>
                                             <input
-                                                type={passwordVisible ? 'text' : 'password'}
+                                                type={
+                                                    passwordVisible
+                                                        ? 'text'
+                                                        : 'password'
+                                                }
                                                 placeholder="Password"
-                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm focus:border-[#187e52] focus:bg-white focus:outline-none transition-all text-slate-800 placeholder-slate-400"
+                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-800 placeholder-slate-400 transition-all focus:border-[#187e52] focus:bg-white focus:outline-none"
                                                 value={data.password}
-                                                onChange={(e) => setData('password', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'password',
+                                                        e.target.value,
+                                                    )
+                                                }
                                             />
                                             {errors.password && (
-                                                <p className="mt-1.5 text-xs text-red-500 font-semibold pl-1">
+                                                <p className="mt-1.5 pl-1 text-xs font-semibold text-red-500">
                                                     {errors.password}
                                                 </p>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                                    <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                                        <label className="flex cursor-pointer items-center gap-2 select-none">
                                             <input
                                                 type="checkbox"
                                                 checked={passwordVisible}
-                                                onChange={() => setPasswordVisible(!passwordVisible)}
+                                                onChange={() =>
+                                                    setPasswordVisible(
+                                                        !passwordVisible,
+                                                    )
+                                                }
                                                 className="h-4 w-4 rounded border-slate-300 text-[#187e52] focus:ring-[#187e52]"
                                             />
                                             Show Password
@@ -181,9 +231,11 @@ export default function Welcome() {
                                             href="#forgot"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                alert("Please contact the system administrator to reset your password.");
+                                                alert(
+                                                    'Please contact the system administrator to reset your password.',
+                                                );
                                             }}
-                                            className="text-[#0d6efd] hover:underline font-semibold"
+                                            className="font-semibold text-[#0d6efd] hover:underline"
                                         >
                                             Forgot Password?
                                         </a>
@@ -193,13 +245,15 @@ export default function Welcome() {
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full cursor-pointer rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full cursor-pointer rounded-xl bg-[#187e52] py-4 text-center font-semibold text-white shadow-md transition-all hover:bg-[#136642] hover:shadow-lg focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                         >
-                                            {processing ? 'Signing in...' : 'Login'}
+                                            {processing
+                                                ? 'Signing in...'
+                                                : 'Login'}
                                         </button>
                                     </div>
 
-                                    <div className="text-center pt-2">
+                                    <div className="pt-2 text-center">
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -227,4 +281,3 @@ export default function Welcome() {
         </>
     );
 }
-
