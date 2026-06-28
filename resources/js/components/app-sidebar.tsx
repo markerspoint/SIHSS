@@ -80,6 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         }
       case 'medical':
+      case 'jo':
         const modules = user.accessible_modules || [];
         const medicalItems: NavItem[] = [
           {
@@ -124,23 +125,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           label: "Medical Portal",
           items: medicalItems,
         }
-      case 'jo':
       default:
         return {
-          label: "Job Order Portal",
-          items: [
-            {
-              title: "Patient Registration",
-              url: "#",
-              icon: UserPlus,
-              isActive: true,
-            },
-            {
-              title: "Queue Registry",
-              url: "#",
-              icon: Layers,
-            },
-          ],
+          label: "Medical Portal",
+          items: [],
         }
     }
   }

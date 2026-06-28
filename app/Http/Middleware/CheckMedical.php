@@ -13,7 +13,9 @@ class CheckMedical
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && in_array($request->user()->role, ['medical', 'admin'])) {
+        $user = $request->user();
+
+        if ($user && in_array($user->role, ['medical', 'admin', 'jo'])) {
             return $next($request);
         }
 

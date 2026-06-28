@@ -27,11 +27,11 @@ class AuthController extends Controller
             // Redirect based on role
             if ($user->role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
-            } elseif ($user->role === 'medical') {
+            } elseif (in_array($user->role, ['medical', 'jo'])) {
                 return redirect()->intended('/medical/dashboard');
             }
             
-            // For other roles (jo), return to gateway home for now
+            // For other roles, return to gateway home for now
             return redirect()->intended('/');
         }
 

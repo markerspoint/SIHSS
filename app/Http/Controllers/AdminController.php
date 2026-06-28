@@ -73,7 +73,7 @@ class AdminController extends Controller
         $user->update([
             'name' => $validated['name'],
             'role' => $validated['role'],
-            'accessible_modules' => $validated['role'] === 'medical' ? ($validated['accessible_modules'] ?? []) : [],
+            'accessible_modules' => in_array($validated['role'], ['medical', 'jo']) ? ($validated['accessible_modules'] ?? []) : [],
         ]);
 
         return redirect()->back()->with('success', 'Employee account successfully updated.');
