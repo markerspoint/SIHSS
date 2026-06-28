@@ -2,6 +2,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MedicalController;
+use App\Http\Controllers\PharmacyController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -27,5 +28,19 @@ Route::middleware(['auth', 'medical', 'prevent-back'])->group(function () {
         Route::delete('/medical/geotagging/{id}', [MedicalController::class, 'deletePatient'])->name('medical.geotagging.delete');
         Route::get('/medical/patients-tagged', [MedicalController::class, 'patientsTagged'])->name('medical.patients-tagged');
         Route::get('/medical/patient-records', [MedicalController::class, 'patientRecords'])->name('medical.patient-records');
+    });
+
+    // Pharmacy Module
+    Route::middleware(['module:pharmacy'])->group(function () {
+        Route::get('/medical/pharmacy/inventory', [PharmacyController::class, 'inventory'])->name('medical.pharmacy.inventory');
+        Route::post('/medical/pharmacy/inventory', [PharmacyController::class, 'storeInventory'])->name('medical.pharmacy.inventory.store');
+        Route::put('/medical/pharmacy/inventory/{id}', [PharmacyController::class, 'updateInventory'])->name('medical.pharmacy.inventory.update');
+        Route::delete('/medical/pharmacy/inventory/{id}', [PharmacyController::class, 'destroyInventory'])->name('medical.pharmacy.inventory.destroy');
+
+        Route::get('/medical/pharmacy/dispensing', [PharmacyController::class, 'dispensing'])->name('medical.pharmacy.dispensing');
+        Route::post('/medical/pharmacy/dispensing', [PharmacyController::class, 'storeDispensation'])->name('medical.pharmacy.dispensing.store');
+        Route::delete('/medical/pharmacy/dispensing/{id}', [PharmacyController::class, 'destroyDispensation'])->name('medical.pharmacy.dispensing.destroy');
+
+        Route::get('/medical/pharmacy/patients', [PharmacyController::class, 'patients'])->name('medical.pharmacy.patients');
     });
 });

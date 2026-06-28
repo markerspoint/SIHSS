@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import React from "react"
 import { Card } from "@/components/ui/card"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import AppLayout from "@/layouts/AppLayout"
 import type { PatientRecord } from "@/types/patient-records-types"
 
@@ -141,38 +142,36 @@ return "Good afternoon"
               </div>
 
               {recentTags && recentTags.length > 0 ? (
-                <div className="overflow-x-auto rounded-xl border border-slate-100">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-100">
-                        <th className="py-2.5 px-3">Patient Name</th>
-                        <th className="py-2.5 px-3">Condition</th>
-                        <th className="py-2.5 px-3">Address</th>
-                        <th className="py-2.5 px-3 text-right">Date Tagged</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                      {recentTags.map((t) => (
-                        <tr key={t.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-3 px-3 font-semibold text-slate-900">{t.name}</td>
-                          <td className="py-3 px-3">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
-                              {t.condition}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-slate-500">{t.address}</td>
-                          <td className="py-3 px-3 text-right text-slate-400 font-mono text-[10px]">
-                            {new Date(t.created_at).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table className="border border-slate-100 rounded-xl overflow-hidden">
+                  <TableHeader>
+                    <TableRow className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider hover:bg-slate-50">
+                      <TableHead className="py-2.5 px-3 h-auto text-slate-500">Patient Name</TableHead>
+                      <TableHead className="py-2.5 px-3 h-auto text-slate-500">Condition</TableHead>
+                      <TableHead className="py-2.5 px-3 h-auto text-slate-500">Address</TableHead>
+                      <TableHead className="py-2.5 px-3 h-auto text-right text-slate-500">Date Tagged</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="text-slate-700 font-medium text-xs">
+                    {recentTags.map((t) => (
+                      <TableRow key={t.id} className="hover:bg-slate-50/50 transition-colors">
+                        <TableCell className="py-3 px-3 font-semibold text-slate-900">{t.name}</TableCell>
+                        <TableCell className="py-3 px-3">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
+                            {t.condition}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-3 px-3 text-slate-500">{t.address}</TableCell>
+                        <TableCell className="py-3 px-3 text-right text-slate-400 font-mono text-[10px]">
+                          {new Date(t.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <div className="text-center py-12 space-y-3">
                   <Map className="h-12 w-12 text-[#187e52] mx-auto opacity-70" />

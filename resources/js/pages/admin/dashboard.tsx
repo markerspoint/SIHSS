@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import {
   Select,
   SelectContent,
@@ -315,107 +316,105 @@ export default function Dashboard({ employees, filters }: DashboardProps) {
         </div>
 
         {/* Directory Table */}
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 font-semibold text-xs tracking-wider uppercase border-b border-slate-100">
-                <th className="py-3.5 px-4 font-semibold">Employee ID</th>
-                <th className="py-3.5 px-4 font-semibold">Name</th>
-                <th className="py-3.5 px-4 font-semibold">Access Role</th>
-                <th className="py-3.5 px-4 font-semibold">Created Date</th>
-                <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-              {employees.length > 0 ? (
-                employees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-900 font-bold">{emp.employee_id}</td>
-                    <td className="py-3.5 px-4 text-slate-800 font-semibold">{emp.name}</td>
-                    <td className="py-3.5 px-4">{getRoleBadge(emp.role)}</td>
-                    <td className="py-3.5 px-4 text-slate-400 text-xs">
-                      {new Date(emp.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="py-3.5 px-4 text-right flex items-center justify-end gap-2">
+        <Table className="border border-slate-100 rounded-xl overflow-hidden">
+          <TableHeader>
+            <TableRow className="bg-slate-50 text-slate-500 font-semibold text-xs tracking-wider uppercase hover:bg-slate-50">
+              <TableHead className="py-3.5 px-4 font-semibold h-auto text-slate-500">Employee ID</TableHead>
+              <TableHead className="py-3.5 px-4 font-semibold h-auto text-slate-500">Name</TableHead>
+              <TableHead className="py-3.5 px-4 font-semibold h-auto text-slate-500">Access Role</TableHead>
+              <TableHead className="py-3.5 px-4 font-semibold h-auto text-slate-500">Created Date</TableHead>
+              <TableHead className="py-3.5 px-4 font-semibold h-auto text-right text-slate-500">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="text-slate-700 font-medium text-sm">
+            {employees.length > 0 ? (
+              employees.map((emp) => (
+                <TableRow key={emp.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="py-3.5 px-4 font-mono text-slate-900 font-bold">{emp.employee_id}</TableCell>
+                  <TableCell className="py-3.5 px-4 text-slate-800 font-semibold">{emp.name}</TableCell>
+                  <TableCell className="py-3.5 px-4">{getRoleBadge(emp.role)}</TableCell>
+                  <TableCell className="py-3.5 px-4 text-slate-400 text-xs">
+                    {new Date(emp.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </TableCell>
+                  <TableCell className="py-3.5 px-4 text-right flex items-center justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                      onClick={() => {
+                        setSelectedEmployee(emp)
+                        setIsViewOpen(true)
+                      }}
+                    >
+                      <Eye className="h-3.5 w-3.5 text-slate-500" />
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                      onClick={() => {
+                        setSelectedEmployee(emp)
+                        editForm.setData({
+                          name: emp.name,
+                          role: emp.role,
+                          accessible_modules: emp.accessible_modules || [],
+                        })
+                        setIsEditOpen(true)
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5 text-slate-500" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                      onClick={() => {
+                        setSelectedEmployee(emp)
+                        resetForm.setData("password", generateRandomPassword())
+                        setIsResetOpen(true)
+                      }}
+                    >
+                      <KeyRound className="h-3.5 w-3.5 text-slate-500" />
+                      Reset Password
+                    </Button>
+                    {currentUser?.id !== emp.id && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
+                        className="inline-flex items-center gap-1 text-xs border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 rounded-lg cursor-pointer"
                         onClick={() => {
                           setSelectedEmployee(emp)
-                          setIsViewOpen(true)
+                          setIsDeleteOpen(true)
                         }}
                       >
-                        <Eye className="h-3.5 w-3.5 text-slate-500" />
-                        View
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
-                        onClick={() => {
-                          setSelectedEmployee(emp)
-                          editForm.setData({
-                            name: emp.name,
-                            role: emp.role,
-                            accessible_modules: emp.accessible_modules || [],
-                          })
-                          setIsEditOpen(true)
-                        }}
-                      >
-                        <Pencil className="h-3.5 w-3.5 text-slate-500" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="inline-flex items-center gap-1 text-xs border-slate-200 hover:bg-slate-50 hover:text-emerald-800 rounded-lg cursor-pointer"
-                        onClick={() => {
-                          setSelectedEmployee(emp)
-                          resetForm.setData("password", generateRandomPassword())
-                          setIsResetOpen(true)
-                        }}
-                      >
-                        <KeyRound className="h-3.5 w-3.5 text-slate-500" />
-                        Reset Password
-                      </Button>
-                      {currentUser?.id !== emp.id && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="inline-flex items-center gap-1 text-xs border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 rounded-lg cursor-pointer"
-                          onClick={() => {
-                            setSelectedEmployee(emp)
-                            setIsDeleteOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          Delete
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-400">
-                    <div className="max-w-[280px] mx-auto space-y-2">
-                      <Users className="h-12 w-12 text-slate-300 mx-auto" />
-                      <h3 className="font-bold text-slate-700">No employees found</h3>
-                      <p className="text-xs text-slate-400">
-                        Try searching for a different name/ID or generate a new employee account.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="py-12 text-center text-slate-400">
+                  <div className="max-w-[280px] mx-auto space-y-2">
+                    <Users className="h-12 w-12 text-slate-300 mx-auto" />
+                    <h3 className="font-bold text-slate-700">No employees found</h3>
+                    <p className="text-xs text-slate-400">
+                      Try searching for a different name/ID or generate a new employee account.
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* EDIT ACCOUNT DIALOG */}

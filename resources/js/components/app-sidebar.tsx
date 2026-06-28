@@ -8,9 +8,24 @@ import {
   Layers,
   ChevronRight,
   LayoutDashboard,
+  Pill,
+  Lock,
+  MapPin,
+  UserCheck,
+  Package,
+  History,
+  HeartHandshake,
 } from "lucide-react"
 import * as React from "react"
 import { NavUser } from "@/components/nav-user"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   Collapsible,
   CollapsibleContent,
@@ -39,10 +54,13 @@ interface NavItem {
   icon: React.ComponentType<any>
   isActive?: boolean
   comingSoon?: boolean
+  noAccess?: boolean
   items?: {
     title: string
     url: string
+    icon?: React.ComponentType<any>
     isActive?: boolean
+    noAccess?: boolean
   }[]
 }
 
@@ -51,6 +69,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Access Inertia share data
   const { props: pageProps, url: currentUrl } = usePage()
   const user = (pageProps.auth as any)?.user || { name: "Guest User", employee_id: "0000", role: "jo" }
+
+  const [noAccessOpen, setNoAccessOpen] = React.useState(false)
+  const [deniedModuleName, setDeniedModuleName] = React.useState("")
 
   // Define sidebar menu configurations based on roles
   const getNavItems = (role: string): { label: string; items: NavItem[] } => {
@@ -82,6 +103,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       case 'medical':
       case 'jo':
         const modules = user.accessible_modules || [];
+        const hasMentalHealth = user.role === 'admin' || modules.includes('mental_health');
+        const hasPharmacy = user.role === 'admin' || modules.includes('pharmacy');
+
         const medicalItems: NavItem[] = [
           {
             title: "Dashboard",
@@ -90,36 +114,59 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ];
 
-        if (user.role === 'admin' || modules.includes('mental_health')) {
-          medicalItems.push({
-            title: "Mental Health",
-            url: "#",
-            icon: HeartPulse,
-            items: [
-              {
-                title: "Geotagging",
-                url: "/medical/geotagging",
-              },
-              {
-                title: "Patients Tagged",
-                url: "/medical/patients-tagged",
-              },
-              {
-                title: "Patient Records",
-                url: "/medical/patient-records",
-              },
-            ],
-          });
-        }
+        medicalItems.push({
+          title: "Mental Health",
+          url: "#",
+          icon: HeartPulse,
+          noAccess: !hasMentalHealth,
+          items: [
+            {
+              title: "Geotagging",
+              url: hasMentalHealth ? "/medical/geotagging" : "#",
+              icon: MapPin,
+              noAccess: !hasMentalHealth,
+            },
+            {
+              title: "Patients Tagged",
+              url: hasMentalHealth ? "/medical/patients-tagged" : "#",
+              icon: UserCheck,
+              noAccess: !hasMentalHealth,
+            },
+            {
+              title: "Patient Records",
+              url: hasMentalHealth ? "/medical/patient-records" : "#",
+              icon: FileText,
+              noAccess: !hasMentalHealth,
+            },
+          ],
+        });
 
-        if (user.role === 'admin' || modules.includes('pharmacy_inventory')) {
-          medicalItems.push({
-            title: "Pharmacy Inventory",
-            url: "#",
-            icon: Layers,
-            comingSoon: true,
-          });
-        }
+        medicalItems.push({
+          title: "Pharmacy",
+          url: "#",
+          icon: Pill,
+          noAccess: !hasPharmacy,
+          items: [
+            {
+              title: "Inventory",
+              url: hasPharmacy ? "/medical/pharmacy/inventory" : "#",
+              icon: Package,
+              noAccess: !hasPharmacy,
+            },
+            {
+              title: "Dispensing",
+              url: hasPharmacy ? "/medical/pharmacy/dispensing" : "#",
+              icon: HeartHandshake,
+              noAccess: !hasPharmacy,
+            },
+            {
+              title: "Patient History",
+              url: hasPharmacy ? "/medical/pharmacy/patients" : "#",
+              icon: History,
+              noAccess: !hasPharmacy,
+            },
+          ],
+        });
 
         return {
           label: "Medical Portal",
@@ -191,7 +238,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         >
                           <IconComponent className="h-4 w-4 shrink-0 text-slate-400" />
                           <span>{item.title}</span>
-                          <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-slate-400" />
+                          {item.noAccess && <Lock className="ml-auto h-3.5 w-3.5 text-slate-400/80 shrink-0" />}
+                          <ChevronRight className={`${item.noAccess ? "ml-1.5" : "ml-auto"} h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-slate-400`} />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -199,18 +247,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           {item.items.map((subItem) => {
                             const isSubActive = subItem.url !== "#" && (currentUrl === subItem.url || currentUrl.startsWith(subItem.url))
 
+                            const handleSubItemClick = (e: React.MouseEvent) => {
+                              if (subItem.noAccess) {
+                                e.preventDefault()
+                                setDeniedModuleName(item.title)
+                                setNoAccessOpen(true)
+                              }
+                            }
+
                             return (
                               <SidebarMenuSubItem key={subItem.title}>
                                 <SidebarMenuSubButton asChild>
                                   <Link 
                                     href={subItem.url}
-                                    className={`block py-1 text-xs font-medium transition-colors cursor-pointer ${
+                                    onClick={handleSubItemClick}
+                                    className={`flex items-center gap-2 w-full py-1 text-xs font-medium transition-colors cursor-pointer ${
                                       isSubActive 
                                         ? "text-[#187e52] font-semibold" 
                                         : "text-slate-500 hover:text-slate-900"
                                     }`}
                                   >
+                                    {subItem.icon && <subItem.icon className="h-3.5 w-3.5 shrink-0 !text-current" />}
                                     <span>{subItem.title}</span>
+                                    {subItem.noAccess && <Lock className="ml-auto h-3 w-3 !text-current opacity-60 shrink-0" />}
                                   </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
@@ -223,6 +282,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 )
               }
 
+              const handleItemClick = (e: React.MouseEvent) => {
+                if (item.comingSoon) {
+                  e.preventDefault()
+                  alert("This module is coming soon!")
+                } else if (item.noAccess) {
+                  e.preventDefault()
+                  setDeniedModuleName(item.title)
+                  setNoAccessOpen(true)
+                }
+              }
+
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
@@ -233,18 +303,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         ? "bg-emerald-50 text-[#187e52] hover:bg-emerald-50 hover:text-[#187e52]"
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
-                    onClick={(e) => handleComingSoon(e, item.comingSoon)}
                   >
                     {item.comingSoon ? (
-                      <a href={item.url}>
+                      <a href={item.url} onClick={handleItemClick}>
                         <IconComponent className={`h-4 w-4 shrink-0 ${isItemActive ? "text-[#187e52]" : "text-slate-400"}`} />
                         <span className="flex-1">{item.title}</span>
                         <span className="text-[8px] bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider scale-90">Soon</span>
                       </a>
                     ) : (
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleItemClick}>
                         <IconComponent className={`h-4 w-4 shrink-0 ${isItemActive ? "text-[#187e52]" : "text-slate-400"}`} />
-                        <span>{item.title}</span>
+                        <span className="flex-1">{item.title}</span>
+                        {item.noAccess && <Lock className="h-3.5 w-3.5 text-slate-400/80 shrink-0" />}
                       </Link>
                     )}
                   </SidebarMenuButton>
@@ -254,6 +324,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Access Denied Dialog */}
+      <Dialog open={noAccessOpen} onOpenChange={setNoAccessOpen}>
+        <DialogContent className="sm:max-w-[400px] rounded-[1.5rem] p-6 text-center">
+          <DialogHeader className="flex flex-col items-center justify-center space-y-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600 border border-red-100">
+              <Lock className="h-5 w-5" />
+            </div>
+            <DialogTitle className="text-xl font-bold text-slate-800">
+              Access Restricted
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 text-xs text-center leading-relaxed">
+              You do not have permission to access the <span className="font-extrabold text-slate-800">{deniedModuleName}</span> module. Please contact your system administrator to request access.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-6 flex justify-center">
+            <Button
+              onClick={() => setNoAccessOpen(false)}
+              className="w-full sm:w-auto rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold cursor-pointer px-6"
+            >
+              Acknowledge
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* User Footer Profile */}
       <SidebarFooter className="border-t border-slate-100 p-2">

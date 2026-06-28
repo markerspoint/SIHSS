@@ -8,9 +8,15 @@ return [
         'coming_soon' => false,
     ],
     [
-        'id' => 'pharmacy_inventory',
-        'name' => 'Pharmacy Inventory Module',
-        'description' => '',
+        'id' => 'pharmacy',
+        'name' => 'Pharmacy Module',
+        'description' => 'Drug Inventory, Dispensation',
+        'coming_soon' => false,
+    ],
+    [
+        'id' => 'dental',
+        'name' => 'Dental Module',
+        'description' => 'Dental Services',
         'coming_soon' => true,
     ],
 ];

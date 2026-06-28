@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import {
   Map,
   useMap,
@@ -313,53 +314,51 @@ export default function GeotaggingPortal() {
               </div>
 
               {/* Table */}
-              <div className="overflow-x-auto rounded-xl border border-slate-100">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-100">
-                      <th className="py-2.5 px-3">Patient Name</th>
-                      <th className="py-2.5 px-3">Disorder</th>
-                      <th className="py-2.5 px-3">Barangay</th>
-                      <th className="py-2.5 px-3 font-mono">Coords (Lat, Lng)</th>
-                      <th className="py-2.5 px-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                    {filteredPatients.length > 0 ? (
-                      filteredPatients.map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">{p.name}</td>
-                          <td className="py-2.5 px-3">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
-                              <HeartPulse className="h-3 w-3 text-indigo-600" />
-                              {p.condition}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-slate-500">{p.address}</td>
-                          <td className="py-2.5 px-3 font-mono text-slate-500 text-[10px]">{p.lat.toFixed(4)}, {p.lng.toFixed(4)}</td>
-                          <td className="py-2.5 px-3 text-right">
-                            <Button
-                              variant="outline"
-                              size="xs"
-                              className="inline-flex items-center gap-1 border-slate-200 hover:bg-slate-50 rounded-lg cursor-pointer text-[10px] px-2 py-1 h-auto"
-                              onClick={() => locatePatient(p)}
-                            >
-                              <Eye className="h-3 w-3 text-slate-500" />
-                              Locate
-                            </Button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-8 text-center text-slate-400">
-                          No patients found in search query.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              <Table className="border border-slate-100 rounded-xl overflow-hidden">
+                <TableHeader>
+                  <TableRow className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider hover:bg-slate-50">
+                    <TableHead className="py-2.5 px-3 h-auto text-slate-500">Patient Name</TableHead>
+                    <TableHead className="py-2.5 px-3 h-auto text-slate-500">Disorder</TableHead>
+                    <TableHead className="py-2.5 px-3 h-auto text-slate-500">Barangay</TableHead>
+                    <TableHead className="py-2.5 px-3 font-mono h-auto text-slate-500">Coords (Lat, Lng)</TableHead>
+                    <TableHead className="py-2.5 px-3 h-auto text-right text-slate-500">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="text-slate-700 font-medium text-xs">
+                  {filteredPatients.length > 0 ? (
+                    filteredPatients.map((p) => (
+                      <TableRow key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                        <TableCell className="py-2.5 px-3 font-semibold text-slate-900">{p.name}</TableCell>
+                        <TableCell className="py-2.5 px-3">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
+                            <HeartPulse className="h-3 w-3 text-indigo-600" />
+                            {p.condition}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-2.5 px-3 text-slate-500">{p.address}</TableCell>
+                        <TableCell className="py-2.5 px-3 font-mono text-slate-500 text-[10px]">{p.lat.toFixed(4)}, {p.lng.toFixed(4)}</TableCell>
+                        <TableCell className="py-2.5 px-3 text-right">
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            className="inline-flex items-center gap-1 border-slate-200 hover:bg-slate-50 rounded-lg cursor-pointer text-[10px] px-2 py-1 h-auto"
+                            onClick={() => locatePatient(p)}
+                          >
+                            <Eye className="h-3 w-3 text-slate-500" />
+                            Locate
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="py-8 text-center text-slate-400">
+                        No patients found in search query.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </Card>
 
           </div>

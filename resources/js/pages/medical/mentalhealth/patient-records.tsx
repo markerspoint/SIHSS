@@ -13,6 +13,7 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { usePatientRecordsHook } from "@/hooks/patient-records-hook"
 import AppLayout from "@/layouts/AppLayout"
 import type { PatientRecord } from "@/types/patient-records-types"
@@ -74,56 +75,54 @@ export default function PatientRecords() {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-100">
-                    <th className="py-3 px-4">Patient Name</th>
-                    <th className="py-3 px-4">Disorder</th>
-                    <th className="py-3 px-4">Barangay Address</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                  {filteredPatients.length > 0 ? (
-                    filteredPatients.map((p) => (
-                      <tr 
-                        key={p.id} 
-                        className={`hover:bg-slate-50/50 transition-colors cursor-pointer ${
-                          selectedPatientId === p.id ? "bg-emerald-50/30" : ""
-                        }`}
-                        onClick={() => setSelectedPatientId(p.id)}
-                      >
-                        <td className="py-3 px-4 font-semibold text-slate-900">{p.name}</td>
-                        <td className="py-3 px-4">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
-                            <HeartPulse className="h-3 w-3 text-indigo-600" />
-                            {p.condition}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-slate-500">{p.address}</td>
-                        <td className="py-3 px-4 text-right onClick-prevent" onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer"
-                            onClick={() => handleDeletePatient(p.id, p.name)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="py-8 text-center text-slate-400">
-                        No patient records found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <Table className="border border-slate-100 rounded-xl overflow-hidden">
+              <TableHeader>
+                <TableRow className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider hover:bg-slate-50">
+                  <TableHead className="py-3 px-4 h-auto text-slate-500">Patient Name</TableHead>
+                  <TableHead className="py-3 px-4 h-auto text-slate-500">Disorder</TableHead>
+                  <TableHead className="py-3 px-4 h-auto text-slate-500">Barangay Address</TableHead>
+                  <TableHead className="py-3 px-4 h-auto text-right text-slate-500">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="text-slate-700 font-medium text-xs">
+                {filteredPatients.length > 0 ? (
+                  filteredPatients.map((p) => (
+                    <TableRow 
+                      key={p.id} 
+                      className={`hover:bg-slate-50/50 transition-colors cursor-pointer ${
+                        selectedPatientId === p.id ? "bg-emerald-50/30" : ""
+                      }`}
+                      onClick={() => setSelectedPatientId(p.id)}
+                    >
+                      <TableCell className="py-3 px-4 font-semibold text-slate-900">{p.name}</TableCell>
+                      <TableCell className="py-3 px-4">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-100">
+                          <HeartPulse className="h-3 w-3 text-indigo-600" />
+                          {p.condition}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-slate-500">{p.address}</TableCell>
+                      <TableCell className="py-3 px-4 text-right onClick-prevent" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer"
+                          onClick={() => handleDeletePatient(p.id, p.name)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-8 text-center text-slate-400">
+                      No patient records found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </Card>
 
           {/* Details Panel */}
