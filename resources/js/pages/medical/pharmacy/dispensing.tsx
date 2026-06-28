@@ -33,31 +33,21 @@ import {
 } from "@/components/ui/dialog"
 import AppLayout from "@/layouts/AppLayout"
 
-interface PharmacyItem {
-  id: number
-  generic_name: string
-  dosage: string
-  form: string
-  quantity: number
-  unit: string
-  expiration_date: string
-}
-
 interface DispensationRecord {
   id: number
   patient_name: string
-  pharmacy_item_id: number
+  generic_name: string
+  dosage: string
+  form: string
   quantity_dispensed: number
   notes: string | null
   created_at: string
-  pharmacy_item?: PharmacyItem
 }
 
 export default function Dispensing() {
   const { props } = usePage()
-  const { dispensations = [], drugs = [] } = props as unknown as {
+  const { dispensations = [] } = props as unknown as {
     dispensations: DispensationRecord[]
-    drugs: PharmacyItem[]
   }
 
   const [searchTerm, setSearchTerm] = useState("")
@@ -68,22 +58,19 @@ export default function Dispensing() {
   // Form definition
   const form = useForm({
     patient_name: "",
-    pharmacy_item_id: "",
+    generic_name: "",
+    dosage: "",
+    form: "Tablet",
     quantity_dispensed: 1,
     notes: "",
   })
 
-  // Selected drug details for quantity checks
-  const selectedDrugId = parseInt(form.data.pharmacy_item_id)
-  const selectedDrug = drugs.find((d) => d.id === selectedDrugId)
-
   // Filtering dispensations
   const filteredDispensations = dispensations.filter((disp) => {
     const searchLower = searchTerm.toLowerCase()
-    const drugName = disp.pharmacy_item?.generic_name || ""
     return (
       disp.patient_name.toLowerCase().includes(searchLower) ||
-      drugName.toLowerCase().includes(searchLower) ||
+      disp.generic_name.toLowerCase().includes(searchLower) ||
       (disp.notes || "").toLowerCase().includes(searchLower)
     )
   })
@@ -182,23 +169,19 @@ export default function Dispensing() {
                         {disp.patient_name}
                       </TableCell>
                       <TableCell className="py-3.5 px-4">
-                        {disp.pharmacy_item ? (
-                          <div className="space-y-0.5">
-                            <span className="font-bold text-slate-800 uppercase">
-                              {disp.pharmacy_item.generic_name}
-                            </span>
-                            <span className="block text-[10px] text-slate-400 font-semibold uppercase">
-                              {disp.pharmacy_item.dosage} &bull; {disp.pharmacy_item.form}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-red-500 italic font-semibold">Unknown Formulation</span>
-                        )}
+                        <div className="space-y-0.5">
+                          <span className="font-bold text-slate-800 uppercase">
+                            {disp.generic_name}
+                          </span>
+                          <span className="block text-[10px] text-slate-400 font-semibold uppercase">
+                            {disp.dosage} &bull; {disp.form}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="py-3.5 px-4 text-center font-extrabold text-slate-800">
                         {disp.quantity_dispensed}{" "}
                         <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                          {disp.pharmacy_item?.unit || "unit(s)"}
+                          unit(s)
                         </span>
                       </TableCell>
                       <TableCell className="py-3.5 px-4">
@@ -277,41 +260,61 @@ export default function Dispensing() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="pharmacy_item_id" className="text-xs font-bold text-slate-600">Select Generic Medicine</Label>
-                <Select
-                  value={form.data.pharmacy_item_id}
-                  onValueChange={(val) => form.setData("pharmacy_item_id", val)}
-                >
-                  <SelectTrigger id="pharmacy_item_id" className="rounded-xl border-slate-200 bg-slate-50/50 text-sm">
-                    <SelectValue placeholder="Choose a medicine formulation" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {drugs.map((drug) => (
-                      <SelectItem key={drug.id} value={drug.id.toString()}>
-                        {drug.generic_name.toUpperCase()} ({drug.dosage} - {drug.form}) [Stock: {drug.quantity}]
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {form.errors.pharmacy_item_id && (
-                  <p className="text-xs text-red-500 font-medium">{form.errors.pharmacy_item_id}</p>
+                <Label htmlFor="generic_name" className="text-xs font-bold text-slate-600">Generic Name</Label>
+                <Input
+                  id="generic_name"
+                  required
+                  placeholder="e.g. Paracetamol"
+                  className="rounded-xl border-slate-200 bg-slate-50/50 focus:border-[#187e52] focus:bg-white text-sm"
+                  value={form.data.generic_name}
+                  onChange={(e) => form.setData("generic_name", e.target.value)}
+                />
+                {form.errors.generic_name && (
+                  <p className="text-xs text-red-500 font-medium">{form.errors.generic_name}</p>
                 )}
               </div>
 
-              {selectedDrug && (
-                <div className="space-y-2.5 p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-2xl flex items-start gap-3">
-                  <Pill className="h-5 w-5 text-[#187e52] shrink-0 mt-0.5" />
-                  <div className="text-xs">
-                    <h5 className="font-bold text-[#187e52] uppercase">Stock Information</h5>
-                    <p className="text-slate-600 mt-1 font-medium">
-                      Available: <span className="font-bold text-slate-900">{selectedDrug.quantity} {selectedDrug.unit}</span>
-                    </p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">
-                      Expiry Date: {new Date(selectedDrug.expiration_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                    </p>
-                  </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="dosage" className="text-xs font-bold text-slate-600">Dosage / Formulation</Label>
+                  <Input
+                    id="dosage"
+                    required
+                    placeholder="e.g. 500mg"
+                    className="rounded-xl border-slate-200 bg-slate-50/50 focus:border-[#187e52] focus:bg-white text-sm"
+                    value={form.data.dosage}
+                    onChange={(e) => form.setData("dosage", e.target.value)}
+                  />
+                  {form.errors.dosage && (
+                    <p className="text-xs text-red-500 font-medium">{form.errors.dosage}</p>
+                  )}
                 </div>
-              )}
+
+                <div className="space-y-1">
+                  <Label htmlFor="form" className="text-xs font-bold text-slate-600">Form</Label>
+                  <Select
+                    value={form.data.form}
+                    onValueChange={(val) => form.setData("form", val)}
+                  >
+                    <SelectTrigger id="form" className="rounded-xl border-slate-200 bg-slate-50/50 text-sm">
+                      <SelectValue placeholder="Select form" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="Tablet">Tablet</SelectItem>
+                      <SelectItem value="Capsule">Capsule</SelectItem>
+                      <SelectItem value="Syrup">Syrup</SelectItem>
+                      <SelectItem value="Suspension">Suspension</SelectItem>
+                      <SelectItem value="Ointment">Ointment</SelectItem>
+                      <SelectItem value="Inhaler">Inhaler</SelectItem>
+                      <SelectItem value="Injection">Injection</SelectItem>
+                      <SelectItem value="Drops">Drops</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.errors.form && (
+                    <p className="text-xs text-red-500 font-medium">{form.errors.form}</p>
+                  )}
+                </div>
+              </div>
 
               <div className="space-y-1">
                 <Label htmlFor="quantity_dispensed" className="text-xs font-bold text-slate-600">Quantity to Dispense</Label>
@@ -370,13 +373,13 @@ export default function Dispensing() {
             <DialogHeader>
               <DialogTitle className="text-lg font-bold text-red-600">Reverse Dispensation</DialogTitle>
               <DialogDescription className="text-slate-500 text-xs mt-1">
-                Are you sure you want to reverse the dispensation of <span className="font-bold text-slate-800">{selectedRecord?.quantity_dispensed} units</span> of <span className="font-bold text-slate-800">{selectedRecord?.pharmacy_item?.generic_name}</span> to <span className="font-bold text-slate-800">{selectedRecord?.patient_name}</span>?
+                Are you sure you want to reverse the dispensation of <span className="font-bold text-slate-800">{selectedRecord?.quantity_dispensed} units</span> of <span className="font-bold text-slate-800">{selectedRecord?.generic_name}</span> to <span className="font-bold text-slate-800">{selectedRecord?.patient_name}</span>?
               </DialogDescription>
             </DialogHeader>
             <div className="py-2.5 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2.5">
               <Info className="h-4.5 w-4.5 text-amber-600 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-700 font-medium leading-normal">
-                This will delete the dispensation log and return the quantity back to the inventory stock levels automatically.
+                This will permanently delete this dispensation log record from the patient history list.
               </p>
             </div>
             <DialogFooter className="pt-4">

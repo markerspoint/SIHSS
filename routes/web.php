@@ -32,11 +32,6 @@ Route::middleware(['auth', 'medical', 'prevent-back'])->group(function () {
 
     // Pharmacy Module
     Route::middleware(['module:pharmacy'])->group(function () {
-        Route::get('/medical/pharmacy/inventory', [PharmacyController::class, 'inventory'])->name('medical.pharmacy.inventory');
-        Route::post('/medical/pharmacy/inventory', [PharmacyController::class, 'storeInventory'])->name('medical.pharmacy.inventory.store');
-        Route::put('/medical/pharmacy/inventory/{id}', [PharmacyController::class, 'updateInventory'])->name('medical.pharmacy.inventory.update');
-        Route::delete('/medical/pharmacy/inventory/{id}', [PharmacyController::class, 'destroyInventory'])->name('medical.pharmacy.inventory.destroy');
-
         Route::get('/medical/pharmacy/dispensing', [PharmacyController::class, 'dispensing'])->name('medical.pharmacy.dispensing');
         Route::post('/medical/pharmacy/dispensing', [PharmacyController::class, 'storeDispensation'])->name('medical.pharmacy.dispensing.store');
         Route::delete('/medical/pharmacy/dispensing/{id}', [PharmacyController::class, 'destroyDispensation'])->name('medical.pharmacy.dispensing.destroy');

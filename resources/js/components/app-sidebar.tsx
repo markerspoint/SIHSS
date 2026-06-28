@@ -148,12 +148,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           noAccess: !hasPharmacy,
           items: [
             {
-              title: "Inventory",
-              url: hasPharmacy ? "/medical/pharmacy/inventory" : "#",
-              icon: Package,
-              noAccess: !hasPharmacy,
-            },
-            {
               title: "Dispensing",
               url: hasPharmacy ? "/medical/pharmacy/dispensing" : "#",
               icon: HeartHandshake,

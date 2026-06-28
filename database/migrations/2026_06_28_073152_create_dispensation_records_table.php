@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('dispensation_records', function (Blueprint $table) {
             $table->id();
             $table->string('patient_name');
-            $table->foreignId('pharmacy_item_id')->constrained('pharmacy_items')->onDelete('cascade');
+            $table->string('generic_name');
+            $table->string('dosage');
+            $table->string('form');
             $table->integer('quantity_dispensed');
             $table->text('notes')->nullable();
             $table->timestamps();
